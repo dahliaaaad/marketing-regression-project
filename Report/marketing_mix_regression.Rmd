@@ -1,0 +1,100 @@
+---
+title: "Marketing Mix Regression Analysis"
+author: Devi Dahlia
+output: pdf_document
+---
+
+## 1. Introduction & Business Context
+
+Companies invest in multiple marketing channels such as Radio, TV, and In-Store promotions to drive product sales. However, without quantitative analysis, it is difficult to determine which channels truly generate value. This project applies simple and multiple linear regression to evaluate the effectiveness of different marketing channels on sales performance using real marketing mix data.
+
+## 2. Business Questions
+
+This project aims to answer the following questions:
+
+1. Which individual marketing channels significantly impact sales?
+2. How do these channels perform when evaluated together in a marketing mix?
+3. How can the regression model be used to forecast sales under different budget scenarios?
+
+## 3. Dataset Description
+
+The dataset contains 104 observations of marketing and sales activity. After cleaning, 100 observations were retained. The dependent variable is **NewVolSales**, and the predictors include **Radio**, **TV**, **InStore**, and **Discount**.
+
+## 4. Data Preparation
+
+```{r}
+# Load dataset
+marketing <- read.csv("~/Desktop/marketing-regression-project/Data/mktmix datasets.csv")
+
+# Keep only relevant variables
+marketing_small <- marketing[, c("NewVolSales", "Radio", "InStore", "TV", "Discount")]
+
+# Remove rows with missing values
+marketing_clean <- marketing_small[complete.cases(marketing_small), ]
+
+# Check cleaned data
+str(marketing_clean)
+summary(marketing_clean)
+
+```
+## 5. Methodology
+
+Simple linear regression was used to evaluate the individual impact of each marketing channel on sales. Multiple linear regression was then applied to assess the combined effect of all marketing channels simultaneously. Model performance was evaluated using p-values, R-squared, and adjusted R-squared.
+
+## 6. Result
+### 6.1 Simple Linear Regression: Radio
+```{r}
+model_radio <- lm(NewVolSales ~ Radio, data = marketing_clean)
+summary(model_radio)
+```
+
+### 6.2 Simple Linear Regression: TV
+```{r}
+model_tv <- lm(NewVolSales ~ TV, data = marketing_clean)
+summary(model_tv)
+```
+
+### 6.3 Simple Linear Regression: InStore
+```{r}
+model_instore <- lm(NewVolSales ~ InStore, data = marketing_clean)
+summary(model_instore)
+```
+
+### 6.4 Multiple Linear Regression Model
+```{r}
+model_multi <- lm(NewVolSales ~ Radio + InStore + TV + Discount,
+data = marketing_clean)
+summary(model_multi)
+```
+
+## 7. Scenario Simulation & Forecasting
+```{r}
+# Scenario 1: TV-heavy, Low InStore
+
+plan_1 <- data.frame(Radio = 300, InStore = 20, TV = 220, Discount = 0.03)
+
+# Scenario 2: High InStore
+
+plan_2 <- data.frame(Radio = 200, InStore = 50, TV = 100, Discount = 0.03)
+
+# Scenario 3: High Discount
+
+plan_3 <- data.frame(Radio = 200, InStore = 35, TV = 120, Discount = 0.08)
+
+# Predictions
+
+predict(model_multi, plan_1)
+predict(model_multi, plan_2)
+predict(model_multi, plan_3)
+```
+
+## 8. Business Recommendations
+
+Based on the regression analysis and forecasting results, the company should prioritize In-Store promotion as it is the most consistent and statistically reliable driver of sales. Strategic discounting can provide additional short-term sales lift but should be applied cautiously due to marginal statistical confidence. TV advertising may be used as a supporting channel, while Radio advertising should be reconsidered due to its consistently weak performance.
+
+## 9. Limitations
+This analysis is subject to several limitations. First, the dataset contains only approximately 100 observations, which may limit statistical power. Second, external factors such as seasonality, competitor activity, pricing strategy, and economic conditions were not included in the model. Finally, the linear regression model assumes linear relationships and does not capture non-linear patterns or interaction effects.
+
+## 10. Conclusion
+This project demonstrates how regression analysis can be applied to real-world marketing data to support evidence-based budget allocation decisions. The results consistently identify In-Store promotion as the strongest driver of sales, while Radio advertising shows no significant impact. Scenario simulations further illustrate how regression models can be used as practical decision-support tools in business planning.
+
